@@ -1,4 +1,4 @@
-import requests, os, time
+import os, time
 
 # Download
 def download_64bit():
@@ -15,23 +15,25 @@ def download_arm():
         os.system("rm ngrok-stable-linux-arm.zip")
 
 # Run and kill
-def run_ngrok(service="http",port=8080):
-        os.system("ngrok %s %s > /dev/null &" % (service, str(port)))
+def run_ngrok(service="http",port=1029):
+        os.system("./ngrok %s %s > /dev/null &" % (service, str(port)))
         time.sleep(10)
         os.system("curl http://localhost:4040/status | grep \"https://*.ngrok.io\" > ngrok.url")
-        fd = open("ngrok.url","r")
+        fd = open("./ngrok.url","r")
         url = fd.read()
         fd.close()
         return url
 def kill_ngrok():
-        os.system("ps all | grep ngrok > ps.txt")
-        time.sleep(0.5)
-        fd = open("ps.txt","r")
-        res = fd.read()
-        fd.close()
-        res = res.split("\t")
-        pid = res[1]
-        os.system("kill -9 %s > /dev/null &" % pid)
+        os.system("pkill -f \"ngrok\"")
 
 
 
+def time_sleep(secs):
+        waited = 0
+        old = time.time()
+        while True:
+                if waited >= 10:
+                        break
+                new = time.time()
+                waited += (new - old)
+                old = new
