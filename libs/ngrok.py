@@ -18,15 +18,10 @@ def download_arm():
 def run_ngrok(service="http",port=1029):
         os.system("./ngrok %s %s > /dev/null &" % (service, str(port)))
         time.sleep(10)
-        os.system("curl http://localhost:4040/status | grep \"https://*.ngrok.io\" > ngrok.url")
-        fd = open("./ngrok.url","r")
-        url = fd.read()
-        fd.close()
-        os.system("rm ngrok.url")
-        return url
+        return get_url
 
 def get_url():
-        os.system("curl http://localhost:4040/status | grep \"https://*.ngrok.io\" > ngrok.url")
+        os.system('echo $(curl -s localhost:4040/inspect/http | grep -oP \'window.common[^;]+\' | sed \'s/^[^\\(]*("//\' | sed \'s/")\\s*$//\' | sed \'s/\\"/"/g\') | jq -r ".Session.Tunnels | values | map(.URL) | .[]" | grep "^https:" > ngrok.url')
         with open("ngrok.url","r") as f:
                 url = f.read()
         os.system("rm ngrok.url")
