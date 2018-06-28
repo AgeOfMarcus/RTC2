@@ -185,9 +185,12 @@ def do_ngrok():
         print(ok("Ngrok server url: "+str(url)))
 
 def start_sequence():
-        print_banner()
         files = Popen("find | grep ngrok",stdout=PIPE,shell=True).communicate()[0].decode()
-        if not len(files) == 16: # cuz ngrok.py
+        files = files.split("\n")
+        nfiles = []
+        for i in files:
+                nfiles.append(i.split("/"))
+        if not 'ngrok' in nfiles: # cuz ngrok.py
                 ver = config.cfg().ver
                 if ver == "64":
                         ngrok.download_64bit()
@@ -198,12 +201,13 @@ def start_sequence():
                 else:
                         print(fail("Incorrect OS version in config.py, using 64bit"))
                         ngrok.download_64bit()
+        print_banner()
 
 def exit_sequence():
         ngrok.kill_ngrok()
 
 def main():
-        start_sequence() #add to
+        start_sequence()
         start_shell(Handler())
 
 if __name__ == "__main__":
