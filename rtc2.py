@@ -201,7 +201,9 @@ def start_sequence():
         files = files.split("\n")
         nfiles = []
         for i in files:
-                nfiles.append(i.split("/"))
+                parts = i.split("/")
+                for i in parts:
+                        nfiles.append(i)
         if not 'ngrok' in nfiles: # cuz ngrok.py
                 ver = config.cfg().ver
                 if ver == "64":
