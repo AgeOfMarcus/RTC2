@@ -23,7 +23,7 @@ def app_cmd():
         for entry in commands:
                 if entry['agent'] == agent_name:
                         cmd = entry['cmd']
-                        uid = entry['uid']
+                        uid = entry['id']
                         return jsonify({
                                 'cmd':cmd,
                                 'id':uid,
@@ -34,7 +34,7 @@ def app_res():
         uid = request.args['id']
         result = request.args['result']
         for entry in commands:
-                if entry['uid'] == uid:
+                if entry['id'] == uid:
                         entry['res'] = result
         return "ok", 200
 

@@ -22,7 +22,16 @@ def run_ngrok(service="http",port=1029):
         fd = open("./ngrok.url","r")
         url = fd.read()
         fd.close()
+        os.system("rm ngrok.url")
         return url
+
+def get_url():
+        os.system("curl http://localhost:4040/status | grep \"https://*.ngrok.io\" > ngrok.url")
+        with open("ngrok.url","r") as f:
+                url = f.read()
+        os.system("rm ngrok.url")
+        return url
+
 def kill_ngrok():
         os.system("pkill -f \"ngrok\"")
 
