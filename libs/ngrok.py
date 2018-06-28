@@ -18,7 +18,7 @@ def download_arm():
 def run_ngrok(service="http",port=1029):
         os.system("./ngrok %s %s > /dev/null &" % (service, str(port)))
         time.sleep(10)
-        return get_url
+        return get_url()
 
 def get_url():
         os.system('echo $(curl -s localhost:4040/inspect/http | grep -oP \'window.common[^;]+\' | sed \'s/^[^\\(]*("//\' | sed \'s/")\\s*$//\' | sed \'s/\\"/"/g\') | jq -r ".Session.Tunnels | values | map(.URL) | .[]" | grep "^https:" > ngrok.url')
