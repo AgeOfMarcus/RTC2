@@ -1,4 +1,5 @@
 import os, time
+from subprocess import Popen, PIPE
 
 # Download
 def download_64bit():
@@ -20,12 +21,15 @@ def run_ngrok(service="http",port=1029):
         time.sleep(10)
         return get_url()
 
+#def get_url():
+#        os.system('''echo $(curl -s localhost:4040/inspect/http | grep -oP "window.common[^;]+" | sed "s/^[^\(]*(\"//" | sed "s/\")\s*$//" | sed "s/\\\"/\"/g") | jq -r \".Session.Tunnels | values | map(.URL) | .[]" | grep "^https:" > /tmp/ngrok.url''')
+#        with open("/tmp/ngrok.url","r") as f:
+#                url = f.read()
+#        os.system("rm /tmp/ngrok.url")
+#        return url
+
 def get_url():
-        os.system('''echo $(curl -s localhost:4040/inspect/http | grep -oP "window.common[^;]+" | sed "s/^[^\(]*(\"//" | sed "s/\")\s*$//" | sed "s/\\\"/\"/g") | jq -r \".Session.Tunnels | values | map(.URL) | .[]" | grep "^https:"''')
-        with open("ngrok.url","r") as f:
-                url = f.read()
-        os.system("rm ngrok.url")
-        return url
+        return Popen("bash ./libs/ngrok_url.sh",stdout=PIPE,shell=True).communicate()[0].decode()
 
 def kill_ngrok():
         os.system("pkill -f \"ngrok\"")

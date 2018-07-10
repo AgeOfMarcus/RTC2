@@ -51,7 +51,9 @@ def start_shell(cmd_handler):
         readline.set_completion_display_matches_hook(completer.display_matches)
         while True:
                 cmd = input("> ")
-                res = cmd_handler.handle(cmd)
+                try:
+                        res = cmd_handler.handle(cmd)
+                except Exception as e: res = "Error: "+str(e)
                 if res == "exit":
                         break
 

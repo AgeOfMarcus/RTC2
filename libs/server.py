@@ -24,6 +24,7 @@ def app_cmd():
                 if entry['agent'] == agent_name and not 'res' in entry:
                         cmd = entry['cmd']
                         uid = entry['id']
+                        entry['status'] = "in-progress"
                         return jsonify({
                                 'cmd':cmd,
                                 'id':uid,
@@ -36,6 +37,7 @@ def app_res():
         for entry in commands:
                 if entry['id'] == uid:
                         entry['res'] = result
+                        entry['status'] = "completed"
         return "ok", 200
 
 
