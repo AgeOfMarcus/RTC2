@@ -144,7 +144,7 @@ class Handler(object):
                         print("Tasks:")
                         for i in tsk:
                                 if (sort == "all") or (sort == i['status']):
-                                        print("Agent: %s, cmd: %s, id: %s, timestamp: %s, status: %s" % (c(i['agent'],"cyan"),c(i['cmd'],"cyan"),c(i['id'],"cyan"),c(i['time'],"cyan"),c(o['status'],"cyan")))
+                                        print("Agent: %s, cmd: %s, id: %s, timestamp: %s, status: %s" % (c(i['agent'],"cyan"),c(i['cmd'],"cyan"),c(i['id'],"cyan"),c(i['time'],"cyan"),c(i['status'],"cyan")))
                         return None
                 elif base == "getResult":
                         try:
