@@ -53,7 +53,9 @@ def start_shell(cmd_handler):
                 cmd = input("> ")
                 try:
                         res = cmd_handler.handle(cmd)
-                except Exception as e: res = "Error: "+str(e)
+                except Exception as e:
+                        print("Error: "+str(e))
+                        res = None
                 if res == "exit":
                         break
 

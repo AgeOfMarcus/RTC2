@@ -143,7 +143,7 @@ class Handler(object):
                         tsk = server.commands
                         print("Tasks:")
                         for i in tsk:
-                                if i['status'] == sort or sort == "all":
+                                if (sort == "all") or (sort == i['status']):
                                         print("Agent: %s, cmd: %s, id: %s, timestamp: %s, status: %s" % (c(i['agent'],"cyan"),c(i['cmd'],"cyan"),c(i['id'],"cyan"),c(i['time'],"cyan"),c(o['status'],"cyan")))
                         return None
                 elif base == "getResult":
