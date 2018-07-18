@@ -1,3 +1,4 @@
+termcolor
 pycrypto
 requests
 flask
