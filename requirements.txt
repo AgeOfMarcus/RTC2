@@ -1,4 +1,4 @@
 termcolor
-pycrypto
+pycryptodome
 requests
 flask
