@@ -29,7 +29,7 @@ def run_ngrok(service="http",port=1029):
 #        return url
 
 def get_url():
-        return Popen("bash ./libs/ngrok_url.sh",stdout=PIPE,shell=True).communicate()[0].decode()
+        return Popen("sh ./libs/ngrok_url.sh",stdout=PIPE,shell=True).communicate()[0].decode()
 
 def kill_ngrok():
         os.system("pkill -f \"ngrok\"")
